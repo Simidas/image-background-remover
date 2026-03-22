@@ -135,7 +135,7 @@ export default function Home() {
               setIsDragging(true);
             }}
             onDragLeave={(e) => {
-              if (!e.currentTarget.contains(e.relatedTarget)) {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
                 setIsDragging(false);
               }
             }}
