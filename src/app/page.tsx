@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 type ImageState = {
   original: string | null;
@@ -13,6 +13,17 @@ export default function Home() {
     result: null,
   });
   const [isDragging, setIsDragging] = useState(false);
+
+  // Prevent browser default drag/drop behavior (stops macOS from opening dropped files)
+  useEffect(() => {
+    const preventDefault = (e: DragEvent) => e.preventDefault();
+    window.addEventListener("dragover", preventDefault);
+    window.addEventListener("drop", preventDefault);
+    return () => {
+      window.removeEventListener("dragover", preventDefault);
+      window.removeEventListener("drop", preventDefault);
+    };
+  }, []);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showOriginal, setShowOriginal] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -120,10 +131,21 @@ export default function Home() {
             }`}
             onDragOver={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               setIsDragging(true);
             }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
+            onDragLeave={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget)) {
+                setIsDragging(false);
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDragging(false);
+              const file = e.dataTransfer.files[0];
+              if (file) handleFile(file);
+            }}
             onClick={() => fileInputRef.current?.click()}
           >
             <div className="text-5xl mb-4">📤</div>
