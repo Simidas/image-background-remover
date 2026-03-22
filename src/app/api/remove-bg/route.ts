@@ -8,10 +8,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "缺少图片数据" }, { status: 400 });
     }
 
-    const apiKey = process.env.CLIPDROP_API_KEY;
+    const apiKey = process.env.REMOVE_BG_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "服务器未配置 CLIPDROP_API_KEY" },
+        { error: "服务器未配置 REMOVE_BG_API_KEY" },
         { status: 500 }
       );
     }
@@ -24,18 +24,21 @@ export async function POST(req: NextRequest) {
 
     const formData = new FormData();
     formData.append("image_file", new Blob([imageBuffer], { type: mimeType }), "image.png");
+    formData.append("size", "auto");
+    formData.append("format", "png");
+    formData.append("channels", "rgba");
 
-    const response = await fetch("https://clipdrop-api.co/remove-background/v1/remove_background", {
+    const response = await fetch("https://api.remove.bg/v1.0/removebg", {
       method: "POST",
       headers: {
-        "x-api-key": apiKey,
+        "X-Api-Key": apiKey,
       },
       body: formData,
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Clipdrop API error:", response.status, errorText);
+      console.error("Remove.bg API error:", response.status, errorText);
       return NextResponse.json(
         { error: "处理失败，请重试" },
         { status: 500 }

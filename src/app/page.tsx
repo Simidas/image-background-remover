@@ -249,7 +249,7 @@ export default function Home() {
           >
             Simidas
           </a>{" "}
-          · 使用 Clipdrop API
+          · 使用 Remove.bg API
         </p>
       </footer>
     </div>
