@@ -34,3 +34,5 @@ jobs:
           projectName: image-background-remover
           directory: .next
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          environmentVariables: |
+            REMOVE_BG_API_KEY
