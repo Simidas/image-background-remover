@@ -71,13 +71,13 @@
 
 ### 后端
 - **API 路由**：Next.js API Routes（`/api/remove-bg`）
-- **图片处理**：直接转发到 Clipdrop，不做服务端存储
-- **环境变量**：`CLIPDROP_API_KEY` 存 Cloudflare Pages 环境变量
+- **图片处理**：直接转发到 remove.bg，不做服务端存储
+- **环境变量**：`REMOVE_BG_API_KEY` 存 Cloudflare Pages 环境变量
 
 ### 第三方服务
 | 服务 | 用途 | 成本 |
 |------|------|------|
-| Clipdrop API | 背景移除 | 免费 100次/天，付费 $0.45/100张 |
+| remove.bg API | 背景移除 | 免费 50次/月，付费 $0.45/100张 |
 
 ---
 
