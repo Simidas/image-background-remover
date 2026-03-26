@@ -275,6 +275,11 @@ export default function Home() {
           </a>{" "}
           · 使用 Remove.bg API
         </p>
+        {process.env.NEXT_PUBLIC_BUILD_TIME && (
+          <p className="mt-1 text-xs text-zinc-400">
+            构建时间：{process.env.NEXT_PUBLIC_BUILD_TIME}
+          </p>
+        )}
       </footer>
     </div>
   );
