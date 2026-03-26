@@ -127,42 +127,29 @@ export default function Home() {
         {/* Upload Area */}
         {!isUploaded && (
           <div
-            className={`w-full max-w-lg flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition-all cursor-pointer select-none touch-manipulation ${
+            className={`w-full max-w-lg flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition-all select-none ${
               isDragging
                 ? "border-blue-500 bg-blue-50"
-                : "border-zinc-300 bg-white hover:border-zinc-400 active:bg-zinc-50"
+                : "border-zinc-300 bg-white"
             }`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsDragging(true);
-            }}
-            onDragLeave={(e) => {
-              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-                setIsDragging(false);
-              }
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsDragging(false);
-              const file = e.dataTransfer.files[0];
-              if (file) handleFile(file);
-            }}
-            onClick={() => fileInputRef.current?.click()}
           >
-            <div className="text-5xl mb-4">📤</div>
-            <p className="text-lg font-medium text-zinc-700">
-              {isDragging ? "松开以上传" : "点击上传或拍照"}
-            </p>
-            <p className="mt-2 text-sm text-zinc-500">支持 JPG/PNG，最大 10MB</p>
-            <p className="mt-1 text-xs text-zinc-400 sm:hidden">📷 可直接拍照上传</p>
+            <label
+              htmlFor="file-upload"
+              className="flex flex-col items-center justify-center cursor-pointer w-full h-full min-h-[200px] touch-manipulation"
+            >
+              <div className="text-5xl mb-4">📤</div>
+              <p className="text-lg font-medium text-zinc-700">
+                {isDragging ? "松开以上传" : "点击上传或拍照"}
+              </p>
+              <p className="mt-2 text-sm text-zinc-500">支持 JPG/PNG，最大 10MB</p>
+              <p className="mt-1 text-xs text-zinc-400 sm:hidden">📷 可直接拍照上传</p>
+            </label>
             <input
+              id="file-upload"
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
-              className="hidden"
+              className="sr-only"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFile(file);
