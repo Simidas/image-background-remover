@@ -133,9 +133,10 @@ export default function Home() {
                 : "border-zinc-300 bg-white"
             }`}
           >
-            <label
-              htmlFor="file-upload"
-              className="flex flex-col items-center justify-center cursor-pointer w-full h-full min-h-[200px] touch-manipulation"
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center justify-center cursor-pointer w-full h-full min-h-[200px] touch-manipulation bg-transparent border-none outline-none"
             >
               <div className="text-5xl mb-4">📤</div>
               <p className="text-lg font-medium text-zinc-700">
@@ -143,13 +144,14 @@ export default function Home() {
               </p>
               <p className="mt-2 text-sm text-zinc-500">支持 JPG/PNG，最大 10MB</p>
               <p className="mt-1 text-xs text-zinc-400 sm:hidden">📷 可直接拍照上传</p>
-            </label>
+            </button>
             <input
               id="file-upload"
               ref={fileInputRef}
               type="file"
               accept="image/*"
               className="sr-only"
+              tabIndex={-1}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFile(file);
