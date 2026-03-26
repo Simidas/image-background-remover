@@ -105,7 +105,9 @@ export default function Home() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const displayImage = showOriginal ? imageState.original : imageState.result;
+  const displayImage = imageState.result
+    ? (showOriginal ? imageState.original : imageState.result)
+    : imageState.original;
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 font-sans">
@@ -195,7 +197,7 @@ export default function Home() {
                       onClick={() => setShowOriginal(!showOriginal)}
                       className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-1.5 rounded-full transition-colors"
                     >
-                      {showOriginal ? "查看结果" : "查看原图"}
+                      {showOriginal ? "查看结果图" : "查看原图"}
                     </button>
                   )}
                   <button
