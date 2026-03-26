@@ -33,8 +33,9 @@ export default function Home() {
   const handleFile = useCallback(async (file: File) => {
     setError(null);
 
-    if (!["image/jpeg", "image/png"].includes(file.type)) {
-      setError("请上传 JPG/PNG 图片");
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!["image/jpeg", "image/png"].includes(file.type) && !["jpeg", "jpg", "png"].includes(ext || "")) {
+      setError("请上传 JPG/PNG/JPEG 图片");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -158,7 +159,7 @@ export default function Home() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png"
+              accept="image/jpeg,image/jpg,image/png,.jpeg,.jpg,.png"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
