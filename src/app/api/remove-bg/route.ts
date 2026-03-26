@@ -39,6 +39,12 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Remove.bg API error:", response.status, errorText);
+      if (response.status === 402) {
+        return NextResponse.json(
+          { error: "API 免费额度已用完（每月 50 次），请下个月再试或购买付费套餐" },
+          { status: 402 }
+        );
+      }
       return NextResponse.json(
         { error: "处理失败，请重试" },
         { status: 500 }
