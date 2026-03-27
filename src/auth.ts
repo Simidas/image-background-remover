@@ -28,37 +28,53 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     // Auto-create user in DB on first sign-in
     async signIn({ user }) {
-      if (!user.email) return false;
-
-      const existing = await getUserByEmail(user.email);
-
-      if (!existing) {
-        // Create user
-        await createUser({
-          id: user.id!,
-          name: user.name ?? null,
-          email: user.email,
-          emailVerified: null,
-          image: user.image ?? null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-
-        // Create free subscription for new user
-        await createSubscription({
-          id: generateId(),
-          userId: user.id!,
-          paypalCustomerId: null,
-          paypalSubscriptionId: null,
-          plan: "free",
-          status: "inactive",
-          credits: 20,
-          currentPeriodEnd: null,
-          createdAt: new Date().toISOString(),
-        });
+      console.log("[auth] signIn callback fired, user:", JSON.stringify({ id: user?.id, email: user?.email, name: user?.name }));
+      if (!user?.email) {
+        console.error("[auth] signIn: no email, rejecting");
+        return false;
+      }
+      if (!user?.id) {
+        console.error("[auth] signIn: no user.id, rejecting");
+        return false;
       }
 
-      return true;
+      try {
+        const existing = await getUserByEmail(user.email);
+        console.log("[auth] signIn: existing user:", existing ? "yes" : "no");
+
+        if (!existing) {
+          const userId = String(user.id);
+          console.log("[auth] signIn: creating user with id=", userId);
+          await createUser({
+            id: userId,
+            name: user.name ?? null,
+            email: user.email,
+            emailVerified: null,
+            image: user.image ?? null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+          console.log("[auth] signIn: user created, creating subscription");
+
+          await createSubscription({
+            id: generateId(),
+            userId,
+            paypalCustomerId: null,
+            paypalSubscriptionId: null,
+            plan: "free",
+            status: "inactive",
+            credits: 20,
+            currentPeriodEnd: null,
+            createdAt: new Date().toISOString(),
+          });
+          console.log("[auth] signIn: subscription created, done");
+        }
+        return true;
+      } catch (err) {
+        console.error("[auth] signIn error:", err);
+        // Still allow sign-in even if DB write fails
+        return true;
+      }
     },
   },
   pages: {
