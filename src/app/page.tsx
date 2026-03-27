@@ -143,14 +143,24 @@ function HomeContent() {
     const params = new URLSearchParams(window.location.search);
     const subStatus = params.get("subscription");
     if (subStatus === "success") {
+      // Persist to sessionStorage so Pro badge survives refresh
+      try { sessionStorage.setItem("sub_success", "1"); } catch {}
       setSubscriptionStatus("success");
       setIsPro(true);
       setCredits(999999);
       // Clean URL
       window.history.replaceState({}, "", "/");
     } else if (subStatus === "cancelled") {
+      try { sessionStorage.removeItem("sub_success"); } catch {}
       setSubscriptionStatus("cancelled");
       window.history.replaceState({}, "", "/");
+    } else {
+      // Restore from sessionStorage on refresh
+      try {
+        if (sessionStorage.getItem("sub_success") === "1") {
+          setSubscriptionStatus("success");
+        }
+      } catch {}
     }
   }, []);
 
@@ -573,6 +583,9 @@ function HomeContent() {
             Simidas
           </a>{" "}
           · Powered by Remove.bg API
+          {process.env.NEXT_PUBLIC_UPDATE_TIME && (
+            <> · Updated {process.env.NEXT_PUBLIC_UPDATE_TIME}</>
+          )}
         </p>
       </footer>
 
