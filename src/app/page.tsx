@@ -316,8 +316,8 @@ function HomeContent() {
             <div className="w-8 h-8 rounded-full bg-zinc-200 animate-pulse" />
           ) : session?.user ? (
             <>
-              {credits !== null && (
-                <CreditsBadge credits={credits} plan={isPro ? "pro" : "free"} />
+              {!isPro && credits !== null && (
+                <CreditsBadge credits={credits} plan="free" />
               )}
               {!isPro && (
                 <button
@@ -567,6 +567,15 @@ function HomeContent() {
           >
             See Pro plans
           </button>
+        </div>
+      )}
+
+      {/* ─── Pro Banner for logged-in users ────────────────────────────────── */}
+      {session?.user && isPro && (
+        <div className="mx-6 mb-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center">
+          <p className="text-amber-800 font-semibold text-sm">
+            ✨ You are a Pro user — enjoy unlimited background removal!
+          </p>
         </div>
       )}
 
