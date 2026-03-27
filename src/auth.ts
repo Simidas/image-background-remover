@@ -1,8 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { db } from "@/db";
-import { users, subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getUserByEmail, createUser, getSubscriptionByUserId, createSubscription } from "@/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -31,15 +29,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user }) {
       if (!user.email) return false;
 
-      const existing = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, user.email!))
-        .limit(1);
+      const existing = await getUserByEmail(user.email);
 
-      if (existing.length === 0) {
+      if (!existing) {
         // Create user
-        await db.insert(users).values({
+        await createUser({
           id: user.id!,
           name: user.name ?? null,
           email: user.email,
@@ -50,12 +44,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
 
         // Create free subscription for new user
-        await db.insert(subscriptions).values({
+        await createSubscription({
           id: crypto.randomUUID(),
           userId: user.id!,
+          paypalCustomerId: null,
+          paypalSubscriptionId: null,
           plan: "free",
           status: "inactive",
           credits: 20,
+          currentPeriodEnd: null,
           createdAt: new Date().toISOString(),
         });
       }

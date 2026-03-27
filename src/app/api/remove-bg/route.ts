@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { subscriptions, usageLogs } from "@/db/schema";
-import { eq, and, gte, lt, sql } from "drizzle-orm";
+import {
+  getSubscriptionByUserId,
+  getUsageLogsByGuestToday,
+  insertUsageLog,
+  decrementCredits,
+} from "@/db";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 
@@ -12,12 +15,9 @@ const FREE_USER_MONTHLY_LIMIT = 20;
 
 function getTodayUTC() {
   const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
-}
-
-function getMonthStartUTC() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  ).toISOString();
 }
 
 // Get or create a guest token from cookies
@@ -36,21 +36,14 @@ async function getGuestToken(): Promise<string> {
 }
 
 // Check if guest has used their daily quota
-async function checkGuestQuota(guestToken: string): Promise<{ allowed: boolean; remaining: number }> {
+async function checkGuestQuota(
+  guestToken: string
+): Promise<{ allowed: boolean; remaining: number }> {
   const todayStart = getTodayUTC();
 
-  const todayLogs = await db
-    .select()
-    .from(usageLogs)
-    .where(
-      and(
-        eq(usageLogs.guestToken, guestToken),
-        eq(usageLogs.action, "remove_bg"),
-        gte(usageLogs.createdAt, todayStart)
-      )
-    );
+  const todayLogs = await getUsageLogsByGuestToday(guestToken, todayStart);
 
-  const used = todayLogs.reduce((sum, l) => sum + l.creditsUsed, 0);
+  const used = todayLogs.reduce((sum, l) => sum + l.credits_used, 0);
   return {
     allowed: used < GUEST_DAILY_LIMIT,
     remaining: Math.max(0, GUEST_DAILY_LIMIT - used),
@@ -62,25 +55,18 @@ async function checkUserCredits(userId: string): Promise<{
   allowed: boolean;
   remaining: number;
   isPro: boolean;
-  sub: typeof subscriptions.$inferSelect | null;
 }> {
-  const subRows = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId))
-    .limit(1);
-
-  const sub = subRows[0] ?? null;
+  const sub = await getSubscriptionByUserId(userId);
 
   // Pro users: unlimited
   if (sub?.plan === "pro" && sub?.status === "active") {
-    return { allowed: true, remaining: 999999, isPro: true, sub };
+    return { allowed: true, remaining: 999999, isPro: true };
   }
 
   const monthlyLimit = FREE_USER_MONTHLY_LIMIT;
   const remaining = sub?.credits ?? monthlyLimit;
 
-  return { allowed: remaining > 0, remaining, isPro: false, sub };
+  return { allowed: remaining > 0, remaining, isPro: false };
 }
 
 // Record usage
@@ -89,7 +75,7 @@ async function recordUsage(params: {
   guestToken?: string;
   creditsUsed: number;
 }) {
-  await db.insert(usageLogs).values({
+  await insertUsageLog({
     id: crypto.randomUUID(),
     userId: params.userId,
     guestToken: params.guestToken,
@@ -99,18 +85,27 @@ async function recordUsage(params: {
   });
 }
 
-// Deduct credits from user
-async function deductCredits(userId: string) {
-  await db
-    .update(subscriptions)
-    .set({
-      credits: sql`${subscriptions.credits} - 1`,
-    })
-    .where(eq(subscriptions.userId, userId));
+/** Convert ArrayBuffer to base64 string (Edge/Workers compatible) */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/** Convert base64 string to Uint8Array (Edge/Workers compatible) */
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
 }
 
 export async function POST(req: NextRequest) {
-  // Rate limit check — basic
   const { image } = await req.json();
   if (!image) {
     return NextResponse.json({ error: "缺少图片数据" }, { status: 400 });
@@ -120,12 +115,11 @@ export async function POST(req: NextRequest) {
   const userId = session?.user?.id;
 
   let guestToken: string | undefined;
-  let guestUsed = false;
 
   if (!userId) {
-    // 🚶 Guest flow
+    // Guest flow
     guestToken = await getGuestToken();
-    const { allowed, remaining } = await checkGuestQuota(guestToken);
+    const { allowed } = await checkGuestQuota(guestToken);
 
     if (!allowed) {
       return NextResponse.json(
@@ -137,11 +131,9 @@ export async function POST(req: NextRequest) {
         { status: 402 }
       );
     }
-
-    guestUsed = true;
   } else {
-    // 👤 Logged-in user flow
-    const { allowed, remaining, isPro } = await checkUserCredits(userId);
+    // Logged-in user flow
+    const { allowed, isPro } = await checkUserCredits(userId);
 
     if (!allowed) {
       return NextResponse.json(
@@ -156,7 +148,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!isPro) {
-      await deductCredits(userId);
+      await decrementCredits(userId);
     }
   }
 
@@ -170,12 +162,16 @@ export async function POST(req: NextRequest) {
   }
 
   const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-  const imageBuffer = Buffer.from(base64Data, "base64");
+  const imageBuffer = base64ToUint8Array(base64Data);
   const mimeMatch = image.match(/^data:(image\/\w+);base64,/);
   const mimeType = mimeMatch ? mimeMatch[1] : "image/png";
 
   const formData = new FormData();
-  formData.append("image_file", new Blob([imageBuffer], { type: mimeType }), "image.png");
+  formData.append(
+    "image_file",
+    new Blob([imageBuffer as BlobPart], { type: mimeType }),
+    "image.png"
+  );
   formData.append("size", "auto");
   formData.append("format", "png");
   formData.append("channels", "rgba");
@@ -201,7 +197,7 @@ export async function POST(req: NextRequest) {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    resultBase64 = Buffer.from(arrayBuffer).toString("base64");
+    resultBase64 = arrayBufferToBase64(arrayBuffer);
   } catch (err) {
     console.error("Remove bg error:", err);
     return NextResponse.json({ error: "处理失败，请重试" }, { status: 500 });

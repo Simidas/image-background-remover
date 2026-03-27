@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getSubscriptionByUserId } from "@/db";
 
 export async function GET() {
   const session = await auth();
@@ -29,14 +27,8 @@ export async function GET() {
     });
   }
 
-  // Get subscription info from DB
-  const subRows = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId))
-    .limit(1);
-
-  const sub = subRows[0] ?? null;
+  // Get subscription info from D1
+  const sub = await getSubscriptionByUserId(userId);
 
   return NextResponse.json({
     isLoggedIn: true,
@@ -51,7 +43,7 @@ export async function GET() {
           plan: sub.plan,
           status: sub.status,
           credits: sub.credits,
-          currentPeriodEnd: sub.currentPeriodEnd,
+          currentPeriodEnd: sub.current_period_end,
         }
       : null,
   });
