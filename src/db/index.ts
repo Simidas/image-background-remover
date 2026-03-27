@@ -27,7 +27,7 @@ function getD1BaseUrl(): string {
       "Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_D1_DATABASE_ID environment variables."
     );
   }
-  return `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/databases/${databaseId}`;
+  return `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}`;
 }
 
 async function d1Query<T = Record<string, unknown>>(
