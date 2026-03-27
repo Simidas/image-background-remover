@@ -358,6 +358,13 @@ function HomeContent() {
                       Signed in as<br />
                       <span className="font-semibold text-zinc-700 truncate block">{session.user.name}</span>
                     </div>
+                    <div className="px-3 py-2 text-xs border-b border-zinc-100">
+                      {isPro ? (
+                        <span className="text-amber-600 font-semibold">✨ Pro Member</span>
+                      ) : (
+                        <span>Free Plan · {credits ?? 20}/20 credits</span>
+                      )}
+                    </div>
                     <button
                       onClick={() => { setShowAvatarMenu(false); signOut(); }}
                       className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
