@@ -25,6 +25,7 @@ type UserStatus = {
 // ─── Helper: format credits display ─────────────────────────────────────────
 
 function CreditsBadge({ credits, plan }: { credits: number; plan: string }) {
+  const displayCredits = isNaN(credits) ? 20 : credits;
   if (plan === "pro") {
     return (
       <span className="inline-flex items-center gap-1 text-sm font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
@@ -34,7 +35,7 @@ function CreditsBadge({ credits, plan }: { credits: number; plan: string }) {
   }
   return (
     <span className="inline-flex items-center gap-1 text-sm text-zinc-600 bg-zinc-100 px-3 py-1 rounded-full">
-      💎 {credits}/20 credits
+      💎 {displayCredits}/20 credits
     </span>
   );
 }
@@ -127,6 +128,7 @@ function HomeContent() {
   const [isUploaded, setIsUploaded] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
+  // credits: number | null | undefined (NaN from arithmetic also possible)
   const [isPro, setIsPro] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -240,7 +242,10 @@ function HomeContent() {
       setImageState((prev) => ({ ...prev, result: data.result }));
       // Deduct credit display optimistically
       if (credits !== null && !isPro) {
-        setCredits((c) => (c !== null ? Math.max(0, c - 1) : null));
+        setCredits((c) => {
+          if (c == null || isNaN(c)) return null;
+          return Math.max(0, c - 1);
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Processing failed");

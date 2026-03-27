@@ -42,7 +42,10 @@ export async function GET() {
       ? {
           plan: sub.plan,
           status: sub.status,
-          credits: sub.credits,
+          credits:
+            typeof sub.credits === "number" && !isNaN(sub.credits)
+              ? sub.credits
+              : 20,
           currentPeriodEnd: sub.current_period_end,
         }
       : null,
