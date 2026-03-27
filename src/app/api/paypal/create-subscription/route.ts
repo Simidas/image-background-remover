@@ -82,11 +82,19 @@ async function createPlan(accessToken: string, productId: string): Promise<strin
       status: "ACTIVE",
       billing_cycles: [
         {
-          frequency: { tenure_type: "REGULAR", interval_unit: "MONTH", interval_count: 1 },
-          pricing_scheme: {
-            fixed_value: { value: PLAN_PRICE, currency_code: PLAN_CURRENCY },
+          frequency: {
+            interval_unit: "MONTH",
+            interval_count: 1,
           },
+          tenure_type: "REGULAR",
           sequence: 1,
+          total_cycles: 0,
+          pricing_scheme: {
+            fixed_price: {
+              value: PLAN_PRICE,
+              currency_code: PLAN_CURRENCY,
+            },
+          },
         },
       ],
       payment_preferences: {
@@ -94,7 +102,6 @@ async function createPlan(accessToken: string, productId: string): Promise<strin
         setup_fee_failure_action: "CONTINUE",
         payment_failure_threshold: 3,
       },
-      currency: PLAN_CURRENCY,
     }),
   });
 
