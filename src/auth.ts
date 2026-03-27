@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { getUserByEmail, createUser, getSubscriptionByUserId, createSubscription } from "@/db";
+import crypto from "node:crypto";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

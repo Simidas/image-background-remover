@@ -131,6 +131,7 @@ function HomeContent() {
   const [error, setError] = useState<string | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   // credits: number | null | undefined (NaN from arithmetic also possible)
   const [isPro, setIsPro] = useState(false);
@@ -172,6 +173,14 @@ function HomeContent() {
       setIsPro(false);
     }
   }, [status]);
+
+  // Close avatar menu when clicking outside
+  useEffect(() => {
+    if (!showAvatarMenu) return;
+    const handler = () => setShowAvatarMenu(false);
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [showAvatarMenu]);
 
   // Prevent browser default drag/drop behavior
   useEffect(() => {
@@ -308,24 +317,44 @@ function HomeContent() {
                   Upgrade
                 </button>
               )}
-              <button
-                onClick={() => signOut()}
-                className="flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
-              >
-                {session.user.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={session.user.image}
-                    alt={session.user.name ?? ""}
-                    className="w-8 h-8 rounded-full"
-                  />
+              <div className="relative">
+                <button
+                  onClick={() => setShowAvatarMenu(!showAvatarMenu)}
+                  className="flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
+                >
+                  {session.user.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={session.user.image}
+                      alt={session.user.name ?? ""}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  {!session.user.image && (
+                    <span className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-semibold text-blue-600">
+                      {session.user.name?.[0] ?? "?"}
+                    </span>
+                  )}
+                  <span className="hidden sm:inline text-xs">▾</span>
+                </button>
+                {showAvatarMenu && (
+                  <div
+                    className="absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-50"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="px-3 py-2 text-xs text-zinc-500 border-b border-zinc-100">
+                      Signed in as<br />
+                      <span className="font-semibold text-zinc-700 truncate block">{session.user.name}</span>
+                    </div>
+                    <button
+                      onClick={() => { setShowAvatarMenu(false); signOut(); }}
+                      className="w-full text-left px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
+                    >
+                      🚪 Sign out
+                    </button>
+                  </div>
                 )}
-                {!session.user.image && (
-                  <span className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-semibold text-blue-600">
-                    {session.user.name?.[0] ?? "?"}
-                  </span>
-                )}
-              </button>
+              </div>
             </>
           ) : (
             <button
