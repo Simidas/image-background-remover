@@ -181,6 +181,8 @@ function HomeContent() {
     } else if (status === "unauthenticated") {
       setCredits(null);
       setIsPro(false);
+      setSubscriptionStatus(null);
+      try { sessionStorage.removeItem("sub_success"); } catch {}
     }
   }, [status]);
 
