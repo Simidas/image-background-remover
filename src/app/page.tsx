@@ -45,9 +45,11 @@ function CreditsBadge({ credits, plan }: { credits: number; plan: string }) {
 function UpgradeModal({
   onClose,
   onSignIn,
+  isLoggedIn,
 }: {
   onClose: () => void;
   onSignIn: () => void;
+  isLoggedIn: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -95,12 +97,14 @@ function UpgradeModal({
           >
             {isLoading ? "⏳ Redirecting..." : "💳 Pay with PayPal ($8.8/mo)"}
           </button>
-          <button
-            onClick={onSignIn}
-            className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold rounded-full transition-colors"
-          >
-            🔑 Sign in for 20 free credits/month
-          </button>
+          {!isLoggedIn && (
+            <button
+              onClick={onSignIn}
+              className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold rounded-full transition-colors"
+            >
+              🔑 Sign in for 20 free credits/month
+            </button>
+          )}
           <button
             onClick={onClose}
             className="w-full py-2 text-zinc-400 hover:text-zinc-600 text-sm transition-colors"
@@ -551,6 +555,7 @@ function HomeContent() {
             setShowUpgradeModal(false);
             signIn("google");
           }}
+          isLoggedIn={!!session?.user}
         />
       )}
     </div>
