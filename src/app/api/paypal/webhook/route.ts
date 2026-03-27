@@ -9,6 +9,7 @@ import { generateId } from "@/lib/id";
 
 type PayPalWebhookEvent =
   | "BILLING.SUBSCRIPTION.CREATED"
+  | "BILLING.SUBSCRIPTION.ACTIVATED"
   | "BILLING.SUBSCRIPTION.CANCELLED"
   | "BILLING.SUBSCRIPTION.PAYMENT.FAILED"
   | "BILLING.SUBSCRIPTION.RE-ACTIVATED";
@@ -83,6 +84,17 @@ export async function POST(req: NextRequest) {
             createdAt: new Date().toISOString(),
           });
         }
+        break;
+      }
+
+      case "BILLING.SUBSCRIPTION.ACTIVATED": {
+        // Payment succeeded — upgrade user to Pro
+        const paypalSubId = resource.id as string;
+        await updateSubscriptionByPaypalId(paypalSubId, {
+          status: "active",
+          plan: "pro",
+          credits: 999999,
+        });
         break;
       }
 
