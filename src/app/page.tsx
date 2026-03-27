@@ -605,6 +605,16 @@ function HomeContent() {
             <> · Updated {process.env.NEXT_PUBLIC_UPDATE_TIME}</>
           )}
         </p>
+        <p className="mt-1">
+          <a
+            href="https://x.com/Weldon_cn"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-zinc-800 transition-colors"
+          >
+            📩 Contact @Weldon_cn on X
+          </a>
+        </p>
       </footer>
 
       {/* ─── Upgrade Modal ──────────────────────────────────────────────────── */}
