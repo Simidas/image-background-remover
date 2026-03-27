@@ -7,7 +7,7 @@ import {
   decrementCredits,
 } from "@/db";
 import { cookies } from "next/headers";
-import crypto from "crypto";
+import { generateId } from "@/lib/id";
 
 const GUEST_COOKIE_NAME = "rb_guest_token";
 const GUEST_DAILY_LIMIT = 1;
@@ -26,7 +26,7 @@ async function getGuestToken(): Promise<string> {
   const existing = cookieStore.get(GUEST_COOKIE_NAME);
   if (existing?.value) return existing.value;
 
-  const token = crypto.randomUUID();
+  const token = generateId();
   cookieStore.set(GUEST_COOKIE_NAME, token, {
     maxAge: 60 * 60 * 24 * 365, // 1 year
     httpOnly: true,
@@ -76,7 +76,7 @@ async function recordUsage(params: {
   creditsUsed: number;
 }) {
   await insertUsageLog({
-    id: crypto.randomUUID(),
+    id: generateId(),
     userId: params.userId,
     guestToken: params.guestToken,
     action: "remove_bg",

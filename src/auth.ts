@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { getUserByEmail, createUser, getSubscriptionByUserId, createSubscription } from "@/db";
-import crypto from "node:crypto";
+import { getUserByEmail, createUser, createSubscription } from "@/db";
+import { generateId } from "@/lib/id";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -46,7 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         // Create free subscription for new user
         await createSubscription({
-          id: crypto.randomUUID(),
+          id: generateId(),
           userId: user.id!,
           paypalCustomerId: null,
           paypalSubscriptionId: null,

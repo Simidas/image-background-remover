@@ -5,7 +5,7 @@ import {
   updateSubscription,
   updateSubscriptionByPaypalId,
 } from "@/db";
-import crypto from "crypto";
+import { generateId } from "@/lib/id";
 
 type PayPalWebhookEvent =
   | "BILLING.SUBSCRIPTION.CREATED"
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
           });
         } else {
           await createSubscription({
-            id: crypto.randomUUID(),
+            id: generateId(),
             userId,
             paypalCustomerId,
             paypalSubscriptionId: paypalSubId,
