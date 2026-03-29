@@ -69,6 +69,12 @@ export async function POST(req: NextRequest) {
               Date.now() + 30 * 24 * 60 * 60 * 1000
             ).toISOString(),
           });
+          // Mark first-month discount as used if not already
+          if (!existing.has_used_first_month_discount) {
+            await updateSubscription(userId, {
+              hasUsedFirstMonthDiscount: 1,
+            });
+          }
         } else {
           await createSubscription({
             id: generateId(),
@@ -81,6 +87,7 @@ export async function POST(req: NextRequest) {
             currentPeriodEnd: new Date(
               Date.now() + 30 * 24 * 60 * 60 * 1000
             ).toISOString(),
+            hasUsedFirstMonthDiscount: 1,
             createdAt: new Date().toISOString(),
           });
         }

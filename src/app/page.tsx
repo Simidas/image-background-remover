@@ -75,9 +75,19 @@ function UpgradeModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-center mb-2">⚡ Upgrade to Pro</h2>
-        <p className="text-center text-zinc-500 mb-6">
-          $8.8 / month — unlimited background removal
+        <div className="text-center mb-2">
+          <span className="inline-block bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full mb-2">
+            🎁 First month just $1
+          </span>
+        </div>
+        <h2 className="text-2xl font-bold text-center mb-1">⚡ Upgrade to Pro</h2>
+        <p className="text-center text-zinc-500 mb-1">
+          <span className="text-amber-600 font-semibold">$1 first month</span>
+          {" · "}
+          then $8.8 / month
+        </p>
+        <p className="text-center text-zinc-400 text-xs mb-6">
+          Cancel anytime · No commitment
         </p>
         <ul className="space-y-2 mb-6 text-sm text-zinc-700">
           {[
@@ -95,7 +105,7 @@ function UpgradeModal({
             disabled={isLoading}
             className="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-zinc-300 text-white font-bold rounded-full transition-colors"
           >
-            {isLoading ? "⏳ Redirecting..." : "💳 Pay with PayPal ($8.8/mo)"}
+            {isLoading ? "⏳ Redirecting..." : "💳 Pay with PayPal — $1 first month"}
           </button>
           {!isLoggedIn && (
             <button

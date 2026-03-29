@@ -55,6 +55,7 @@ export const subscriptions = sqliteTable("subscriptions", {
   status: text("status").notNull().default("inactive"), // 'active' | 'inactive' | 'canceled' | 'past_due'
   credits: integer("credits").notNull().default(20), // remaining credits this period
   currentPeriodEnd: text("current_period_end"), // ISO string
+  hasUsedFirstMonthDiscount: integer("has_used_first_month_discount").notNull().default(0), // 0=not used, 1=used
   createdAt: text("created_at").notNull().default("CURRENT_TIMESTAMP"),
 });
 

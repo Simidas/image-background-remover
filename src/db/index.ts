@@ -147,6 +147,7 @@ export async function getSubscriptionByUserId(userId: string) {
     status: string;
     credits: number;
     current_period_end: string | null;
+    has_used_first_month_discount: number;
     created_at: string;
   }>("SELECT * FROM subscriptions WHERE user_id = ? LIMIT 1", [userId]);
   return rows[0] ?? null;
@@ -162,6 +163,7 @@ export async function getSubscriptionByPaypalId(paypalSubscriptionId: string) {
     status: string;
     credits: number;
     current_period_end: string | null;
+    has_used_first_month_discount: number;
     created_at: string;
   }>(
     "SELECT * FROM subscriptions WHERE paypal_subscription_id = ? LIMIT 1",
@@ -179,11 +181,12 @@ export async function createSubscription(values: {
   status: string;
   credits: number;
   currentPeriodEnd: string | null;
+  hasUsedFirstMonthDiscount?: number;
   createdAt: string;
 }) {
   await d1Exec(
-    `INSERT INTO subscriptions (id, user_id, paypal_customer_id, paypal_subscription_id, plan, status, credits, current_period_end, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO subscriptions (id, user_id, paypal_customer_id, paypal_subscription_id, plan, status, credits, current_period_end, has_used_first_month_discount, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       values.id,
       values.userId,
@@ -193,6 +196,7 @@ export async function createSubscription(values: {
       values.status,
       values.credits,
       values.currentPeriodEnd,
+      values.hasUsedFirstMonthDiscount ?? 0,
       values.createdAt,
     ]
   );
@@ -207,6 +211,7 @@ export async function updateSubscription(
     status?: string;
     credits?: number;
     currentPeriodEnd?: string | null;
+    hasUsedFirstMonthDiscount?: number;
   }
 ) {
   const sets: string[] = [];
@@ -236,6 +241,10 @@ export async function updateSubscription(
     sets.push("current_period_end = ?");
     params.push(values.currentPeriodEnd);
   }
+  if (values.hasUsedFirstMonthDiscount !== undefined) {
+    sets.push("has_used_first_month_discount = ?");
+    params.push(values.hasUsedFirstMonthDiscount);
+  }
 
   if (sets.length === 0) return;
 
@@ -252,6 +261,7 @@ export async function updateSubscriptionByPaypalId(
     status?: string;
     plan?: string;
     credits?: number;
+    hasUsedFirstMonthDiscount?: number;
   }
 ) {
   const sets: string[] = [];
@@ -268,6 +278,10 @@ export async function updateSubscriptionByPaypalId(
   if (values.credits !== undefined) {
     sets.push("credits = ?");
     params.push(values.credits);
+  }
+  if (values.hasUsedFirstMonthDiscount !== undefined) {
+    sets.push("has_used_first_month_discount = ?");
+    params.push(values.hasUsedFirstMonthDiscount);
   }
 
   if (sets.length === 0) return;
