@@ -72,7 +72,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             paypalSubscriptionId: null,
             plan: "free",
             status: "inactive",
-            credits: 20,
+            credits: 5,
             currentPeriodEnd: null,
             createdAt: new Date().toISOString(),
           });

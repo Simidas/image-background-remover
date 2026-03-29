@@ -12,7 +12,7 @@ import { generateId } from "@/lib/id";
 
 const GUEST_COOKIE_NAME = "rb_guest_token";
 const GUEST_DAILY_LIMIT = 1;
-const FREE_USER_MONTHLY_LIMIT = 20;
+const FREE_USER_MONTHLY_LIMIT = 5;
 
 function getTodayUTC() {
   const now = new Date();

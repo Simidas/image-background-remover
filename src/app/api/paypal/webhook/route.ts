@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         await updateSubscriptionByPaypalId(paypalSubId, {
           status: "canceled",
           plan: "free",
-          credits: 20,
+          credits: 5,
         });
         break;
       }
