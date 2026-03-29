@@ -21,8 +21,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
+      if (session.user?.email) {
+        // Look up the correct database user_id by email
+        // (JWT sub may differ from stored user_id if Google OAuth app changed)
+        try {
+          const dbUser = await getUserByEmail(session.user.email);
+          if (dbUser) {
+            session.user.id = dbUser.id;
+          }
+        } catch (err) {
+          console.error("[session] failed to look up user by email:", err);
+        }
       }
       return session;
     },
