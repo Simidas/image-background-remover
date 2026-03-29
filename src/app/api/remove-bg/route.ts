@@ -57,7 +57,13 @@ async function checkUserCredits(userId: string): Promise<{
   remaining: number;
   isPro: boolean;
 }> {
-  const sub = await getSubscriptionByUserId(userId);
+  let sub = await getSubscriptionByUserId(userId);
+
+  // If no subscription exists, create one with 20 credits
+  if (!sub) {
+    await ensureSubscription(userId);
+    sub = await getSubscriptionByUserId(userId);
+  }
 
   // Pro users: unlimited
   if (sub?.plan === "pro" && sub?.status === "active") {
@@ -151,7 +157,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (!isPro) {
-      await decrementCredits(userId);
+      // Atomically decrement and verify the row exists
+      const result = await decrementCredits(userId);
+      if (!result) {
+        // Subscription didn't exist or had no credits — re-create and try again
+        await ensureSubscription(userId);
+        await decrementCredits(userId);
+      }
     }
   }
 

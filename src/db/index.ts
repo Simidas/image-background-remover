@@ -312,11 +312,12 @@ export async function updateSubscriptionByPaypalId(
   );
 }
 
-export async function decrementCredits(userId: string) {
-  await d1Exec(
-    "UPDATE subscriptions SET credits = credits - 1 WHERE user_id = ?",
+export async function decrementCredits(userId: string): Promise<boolean> {
+  const rows = await d1Query<{ credits: number }>(
+    "UPDATE subscriptions SET credits = credits - 1 WHERE user_id = ? RETURNING credits",
     [userId]
   );
+  return rows.length > 0;
 }
 
 // ---------------------------------------------------------------------------
