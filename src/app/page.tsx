@@ -25,7 +25,7 @@ type UserStatus = {
 // ─── Helper: format credits display ─────────────────────────────────────────
 
 function CreditsBadge({ credits, plan }: { credits: number; plan: string }) {
-  const displayCredits = isNaN(credits) ? 20 : credits;
+  const displayCredits = isNaN(credits) ? 5 : credits;
   if (plan === "pro") {
     return (
       <span className="inline-flex items-center gap-1 text-sm font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
@@ -35,7 +35,7 @@ function CreditsBadge({ credits, plan }: { credits: number; plan: string }) {
   }
   return (
     <span className="inline-flex items-center gap-1 text-sm text-zinc-600 bg-zinc-100 px-3 py-1 rounded-full">
-      💎 {displayCredits}/20 credits
+      💎 {displayCredits} credits
     </span>
   );
 }
@@ -112,7 +112,7 @@ function UpgradeModal({
               onClick={onSignIn}
               className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold rounded-full transition-colors"
             >
-              🔑 Sign in for 20 free credits/month
+              🔑 Sign in for 5 free credits/month
             </button>
           )}
           <button
@@ -372,7 +372,7 @@ function HomeContent() {
                       {isPro ? (
                         <span className="text-amber-600 font-semibold">✨ Pro Member</span>
                       ) : (
-                        <span>Free Plan · {credits ?? 20}/20 credits</span>
+                        <span>Free Plan · {credits ?? 5} credits</span>
                       )}
                     </div>
                     <button
@@ -435,8 +435,8 @@ function HomeContent() {
           {session?.user
             ? isPro
               ? "Pro user — unlimited use"
-              : `${credits ?? 20} credits remaining this month`
-            : "Sign in for 20 credits/month · Pro for $8.8/mo"}
+              : `${credits ?? 5} credits remaining this month`
+            : "Sign in for 5 credits/month · Pro for $8.8/mo"}
         </p>
       </div>
 
@@ -578,7 +578,7 @@ function HomeContent() {
         <div className="mx-6 mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl text-center">
           <p className="text-amber-800 font-semibold mb-1">Want unlimited use?</p>
           <p className="text-amber-600 text-sm mb-4">
-            Sign in for 20 free credits/month · Pro for $8.8/mo
+            Sign in for 5 free credits/month · Pro for $8.8/mo
           </p>
           <button
             onClick={() => setShowUpgradeModal(true)}
