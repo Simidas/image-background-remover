@@ -155,16 +155,6 @@ export async function POST(req: NextRequest) {
         { status: 402 }
       );
     }
-
-    if (!isPro) {
-      // Atomically decrement and verify the row exists
-      const result = await decrementCredits(userId);
-      if (!result) {
-        // Subscription didn't exist or had no credits — re-create and try again
-        await ensureSubscription(userId);
-        await decrementCredits(userId);
-      }
-    }
   }
 
   // Call remove.bg API
@@ -218,12 +208,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "处理失败，请重试" }, { status: 500 });
   }
 
-  // Record usage (after successful API call)
+  // Record usage + deduct credits only after API call succeeded
   await recordUsage({
     userId,
     guestToken,
     creditsUsed: 1,
   });
+
+  // Decrement credits for non-pro logged-in users
+  if (userId) {
+    const sub = await getSubscriptionByUserId(userId);
+    if (!sub || sub.plan !== "pro") {
+      await decrementCredits(userId);
+    }
+  }
 
   const resultDataUrl = `data:image/png;base64,${resultBase64}`;
   return NextResponse.json({ result: resultDataUrl });
