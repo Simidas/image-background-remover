@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import {
   getSubscriptionByUserId,
+  ensureSubscription,
   getUsageLogsByGuestToday,
   insertUsageLog,
   decrementCredits,
@@ -132,7 +133,9 @@ export async function POST(req: NextRequest) {
       );
     }
   } else {
-    // Logged-in user flow
+    // Logged-in user flow — ensure subscription exists first
+    await ensureSubscription(userId);
+
     const { allowed, isPro } = await checkUserCredits(userId);
 
     if (!allowed) {

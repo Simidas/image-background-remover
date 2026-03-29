@@ -1,3 +1,5 @@
+import { generateId } from "@/lib/id";
+
 /**
  * Cloudflare D1 HTTP API client.
  * Replaces drizzle-orm + better-sqlite3 for Edge/Workers compatibility.
@@ -136,6 +138,23 @@ export async function createUser(values: {
 // ---------------------------------------------------------------------------
 // Subscriptions
 // ---------------------------------------------------------------------------
+
+export async function ensureSubscription(userId: string): Promise<void> {
+  const existing = await getSubscriptionByUserId(userId);
+  if (!existing) {
+    await createSubscription({
+      id: generateId(),
+      userId,
+      paypalCustomerId: null,
+      paypalSubscriptionId: null,
+      plan: "free",
+      status: "inactive",
+      credits: 20,
+      currentPeriodEnd: null,
+      createdAt: new Date().toISOString(),
+    });
+  }
+}
 
 export async function getSubscriptionByUserId(userId: string) {
   const rows = await d1Query<{
