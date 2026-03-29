@@ -17,7 +17,7 @@ interface D1Response {
   success: boolean;
   errors: Array<{ code: number; message: string }>;
   messages: Array<{ code: number; message: string }>;
-  result: unknown[] | null;
+  result: Array<{ results: unknown[]; success: boolean; meta?: Record<string, unknown> }> | null;
   result_info?: { total_count: number; count: number };
 }
 
@@ -62,7 +62,16 @@ async function d1Query<T = Record<string, unknown>>(
     throw new Error(`D1 query failed: ${errMsg}`);
   }
 
-  return (data.result ?? []) as T[];
+  // D1 HTTP API returns an array of result objects (one per statement).
+  // Each result object has { results: rows[], success: bool }.
+  // Flatten all rows from all result objects.
+  const allRows: T[] = [];
+  for (const resultObj of data.result ?? []) {
+    if (resultObj.success && Array.isArray(resultObj.results)) {
+      allRows.push(...(resultObj.results as T[]));
+    }
+  }
+  return allRows;
 }
 
 /** Execute a write query (INSERT/UPDATE/DELETE) that doesn't need results */
@@ -88,7 +97,16 @@ async function d1Exec(sql: string, params: unknown[] = []): Promise<void> {
 
   const data: D1Response = await res.json();
 
-  if (!data.success) {
+  // Check each result object's success flag (D1 batch returns per-statement success)
+  for (const resultObj of data.result ?? []) {
+    if (!resultObj.success) {
+      const errMsg = data.errors.map((e) => e.message).join("; ");
+      throw new Error(`D1 exec failed: ${errMsg}`);
+    }
+  }
+
+  // Also check top-level errors array
+  if (!data.success || (data.errors && data.errors.length > 0)) {
     const errMsg = data.errors.map((e) => e.message).join("; ");
     throw new Error(`D1 exec failed: ${errMsg}`);
   }
