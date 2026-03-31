@@ -13,9 +13,69 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://image-background-remover.zhuwd.com";
+const ogImageUrl = `${siteUrl}/og-image.png`;
+const siteName = "RemoveBG Pro";
+const shortDescription =
+  "One-click AI background removal. Upload your image and get a transparent PNG in seconds. No signup required for free tier.";
+
 export const metadata: Metadata = {
-  title: "一键去除图片背景 | Free Remove BG",
-  description: "免费在线去除图片背景，最快3秒完成，支持JPG/PNG，无需注册",
+  title: {
+    default: "RemoveBG Pro — AI Background Remover",
+    template: `%s | RemoveBG Pro`,
+  },
+  description: shortDescription,
+  keywords: [
+    "background remover",
+    "remove background",
+    "image background removal",
+    "transparent background",
+    "product photo editor",
+    "AI background eraser",
+    "free background remover",
+  ],
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName,
+    title: "RemoveBG Pro — One-Click AI Background Remover",
+    description: shortDescription,
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "RemoveBG Pro — AI Background Remover",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@Weldon_cn",
+    creator: "@Weldon_cn",
+    title: "RemoveBG Pro — One-Click AI Background Remover",
+    description: shortDescription,
+    images: [ogImageUrl],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export const viewport = {
