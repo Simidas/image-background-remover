@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Disallow API routes (no valuable content for search engines)
+Disallow: /api/
+
+# Disallow admin/internal paths (if any in future)
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://image-background-remover.zhuwd.com/sitemap.xml
+
+# Crawl-delay hint (optional, polite crawl)
+Crawl-delay: 1
