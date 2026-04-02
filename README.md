@@ -1,37 +1,78 @@
-# Image Background Remover 🖼️✂️
+# RemoveBG Pro
 
-> 一键去除图片背景，无需注册，3 秒完成
+> AI-powered background removal — 3 seconds, no signup required.
 
-## Tech Stack
+[![Live](https://img.shields.io/badge/Live-demo-green?style=flat-square)](https://image-background-remover.zhuwd.com)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![Twitter](https://img.shields.io/badge/Twitter-@simidas_dev-blue?style=flat-square&logo=twitter)](https://twitter.com/simidas_dev)
 
-- **Framework**: Next.js 16 (App Router)
-- **Styling**: Tailwind CSS
-- **API**: Clipdrop API
-- **Deployment**: Cloudflare Pages
+**RemoveBG Pro** is a fast, free AI background remover built for e-commerce sellers, photographers, and developers who need to process product photos at scale.
 
-## Setup
+- ⚡ **3-second processing** — AI removes backgrounds in 3 seconds
+- 🆓 **Free tier** — 5 credits/month, no signup required
+- 📦 **Batch-friendly** — Clean API for programmatic use
+- 🔒 **Privacy-first** — Files deleted immediately after processing
 
-### 1. Install dependencies
+![Hero](public/og-image.png)
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| **Drag & Drop** | Upload by dragging or clicking, no account needed |
+| **Real-time Preview** | Side-by-side comparison of original vs result |
+| **Multiple Formats** | Supports JPG, PNG up to 10MB |
+| **Mobile Ready** | Fully responsive, works on any device |
+| **HD Download** | Export transparent PNG at full resolution |
+| **API Access** | REST API for programmatic integration (Pro) |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 16 (App Router) |
+| Styling | Tailwind CSS |
+| AI Backend | Clipdrop API |
+| Database | Cloudflare D1 (credits & sessions) |
+| Storage | Cloudflare R2 (file processing) |
+| Deployment | Cloudflare Pages + Workers |
+| Auth | Google OAuth + PayPal Subscription |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
 
 ```bash
+git clone https://github.com/Simidas/image-background-remover.git
+cd image-background-remover
 npm install
 ```
 
-### 2. Configure API Key
-
-Copy `.env.local.example` to `.env.local` and add your Clipdrop API key:
+### 2. Configure Environment
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Get your free API key at: https://clipdrop.co/
+Edit `.env.local`:
 
 ```env
-CLIPDROP_API_KEY=your_api_key_here
+# Clipdrop API (https://clipdrop.co/apis)
+CLIPDROP_API_KEY=your_clipdrop_api_key
+
+# Cloudflare (for D1 + R2)
+CF_ACCOUNT_ID=your_cloudflare_account_id
+CF_D1_DATABASE_ID=your_d1_database_id
+CF_R2_BUCKET=your_r2_bucket_name
 ```
 
-### 3. Run locally
+### 3. Run Locally
 
 ```bash
 npm run dev
@@ -39,24 +80,42 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Features
+---
 
-- ✅ 拖拽/点击上传图片
-- ✅ 支持 JPG/PNG，最大 10MB
-- ✅ 一键移除背景
-- ✅ 实时预览对比（原图/结果）
-- ✅ 一键下载 PNG
-- ✅ 移动端适配
-- ✅ 无需注册
+## 📖 Use Cases
 
-## Deploy to Cloudflare Pages
+### E-commerce Sellers
+Remove backgrounds from product photos for Shopify, Amazon, WooCommerce listings — in 3 seconds per image.
 
-1. Push to GitHub
-2. Connect repo to [Cloudflare Pages](https://pages.cloudflare.com/)
-3. Set build command: `npm run build`
-4. Set output directory: `.next`
-5. Add environment variable: `CLIPDROP_API_KEY`
+### Photographers
+Clean up headshots and portraits with precise edge detection.
 
-## License
+### Developers
+Integrate via API for batch processing in your own workflow.
 
-MIT
+---
+
+## 🌍 SEO Content
+
+Looking for background removal guides? Read our blog:
+
+- [Best Free Background Remover Tools (2026) — Top 10 Compared](https://image-background-remover.zhuwd.com/blog/best-free-background-remover-tools-2026)
+- [How to Remove Background from Product Photos in 2026](https://image-background-remover.zhuwd.com/blog/product-photo-guide)
+- [Background Remover for Shopify: Complete Workflow Guide](https://image-background-remover.zhuwd.com/blog/background-remover-for-shopify)
+- [Transparent Background PNG: When and How to Use It](https://image-background-remover.zhuwd.com/blog/transparent-background-png)
+
+---
+
+## 🧩 API (Pro)
+
+Coming soon — programmatic access for batch processing.
+
+---
+
+## 📄 License
+
+MIT © 2026 [Simidas](https://twitter.com/simidas_dev)
+
+---
+
+*If you find this useful, please consider giving it a ⭐*
